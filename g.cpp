@@ -50,6 +50,7 @@ g::g(string g6){
   edges = new int*[n];
   for (int i = 0; i < n; i++) {
     edges[i] = new int[n];
+    gA[i].resize(arraySize, 0);
   }
 
   sixbit = ((int) edgestr.at(0)) - 63;
@@ -64,16 +65,15 @@ g::g(string g6){
         d = 6;
         edgestr = edgestr.substr(1);
       }
-      if ((sixbit >> (d - 1)) % 2 == 1) {
+      if (((sixbit >> (d - 1)) % 2) == 1) {
         add_edge(i, j);
-        d--;
       }
+      d--;
     }
   }
 }
 
 void g::print_g6(ostream *o) {
-  cout << "OK\n";
   if (0 <= n && n <= 62)
     *o << ::itosbbe(n, 0);
   else if (63 <= n && n <= 258047)
@@ -86,7 +86,6 @@ void g::print_g6(ostream *o) {
 
   int i = 0;
   int sb = 0;
-  cout << "OK2\n";
   for (int c = 1; c < n ; c++) {
     for (int r = 0; r < c; r++) {
       sb = (sb << 1) + is_edge(r, c);
@@ -98,7 +97,6 @@ void g::print_g6(ostream *o) {
       }
     }
   }
-  cout << "OK3\n";
   if (i != 0) {
     sb = sb << (6 - i);
     *o << ::itosbbe(sb, 0);

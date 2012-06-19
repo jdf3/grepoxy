@@ -8,8 +8,10 @@ using namespace std;
 int main(int argc, char *argv[]) {
   string str;
   while (getline(cin, str)) {
+    cout << "IN: " << str << endl;
     g gr = g(str);
-    gr.add_edge(0, 1);
-    cout << gr.order() << endl;
+    cout << "EDGES: " << gr.num_edges() << endl << "VERTICES: " << gr.order() << endl << "GRAPH: ";
+    gr.print_g6();
+    cout << endl;
   }
 }
