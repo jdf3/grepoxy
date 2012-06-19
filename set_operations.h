@@ -1,5 +1,5 @@
 #ifndef _SET_OPERATIONS_H
-#define _SET_OEPRATIONS_H
+#define _SET_OPERATIONS_H
 
 #include <vector>
 #include <stdint.h>

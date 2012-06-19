@@ -26,8 +26,8 @@ class g {
 
   private:
     int n, arraySize, numEdges, oldN;
-    vector<vset> A;
-    int ** edges;
+    vector<vset> gA;
+    int **edges;
 
   private:
     int sbbetoi(string str);
