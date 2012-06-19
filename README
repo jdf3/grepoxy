@@ -1,0 +1,6 @@
+Grepoxy
+-----------------------------------------------------------------------
+This program glues graphs together in all possible ways subject to
+certain restrictions.
+
+For now, all that is needed is a C++11-compliant compiler.
