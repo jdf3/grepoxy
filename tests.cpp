@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "g.h"
+#include "lib/g.h"
 
 using namespace std;
 

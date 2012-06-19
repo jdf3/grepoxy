@@ -7,5 +7,4 @@ For now, all that is needed is a C++11-compliant compiler.
 
 For testing and running:
 
-g++ -Wall -pedantic -g -o grepoxy main.cpp g.cpp set_operations.cpp
-echo "BW" | ./grepoxy
+g++ -Wall -pedantic -g -o tests tests.cpp lib/g.cpp lib/set_operations.cpp
