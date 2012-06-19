@@ -46,10 +46,10 @@ g::g(string g6){
   if ((n % intSize) != 0)
     arraySize++;
   gA.resize(n);
+  /*degrees.resize(n);*/
 
-  edges = new int*[n];
   for (int i = 0; i < n; i++) {
-    edges[i] = new int[n];
+    /*degrees[i] = 0;*/
     gA[i].resize(arraySize, 0);
   }
 
@@ -106,15 +106,20 @@ void g::print_g6(ostream *o) {
 
 void g::add_edge(int u, int v){
   if (u < n && u >= 0 && v < n && v >= 0){
-    numEdges++;
     set_insert(u, gA[v]);
     set_insert(v, gA[u]);
-    edges[u][v] = numEdges;
-    edges[v][u] = numEdges;
   }
   else{
     cerr << "Error: Invalid vertices " << u << " and " << v << endl;
     cerr << "Size of graph = " << n << endl;
+  }
+}
+
+void g::remove_edge(int u, int v) {
+  if (u < n && u >= 0 && v < n && v >= 0
+      && in_set(u, gA[v]) && in_set(v, gA[u])) {
+    set_delete(u, gA[v]);
+    set_delete(v, gA[v]);
   }
 }
 
@@ -133,15 +138,12 @@ int g::num_edges() {
 
 void g::recalc_edges() {
   numEdges = 0;
-  for (int i = 0; i < n - 1; i++){
-    for (int j = i; j < n; j++){
-      if (is_edge(i, j)){
+  for (int i = 0; i < n - 1; i++) {
+    for (int j = i; j < n; j++) {
+      if (is_edge(i, j)) {
 	      numEdges++;
-	      edges[i][j] = numEdges;
-	      edges[j][i] = numEdges;
-      } else {
-	      edges[i][j] = 0;
-	      edges[j][i] = 0;
+	      degrees[i]++;
+	      degrees[j]++;
       }
     }
   }
@@ -157,16 +159,21 @@ bool g::has_cycle(int c) {
           for (int p = 0; p < n; p++) {
             if (is_edge(i, p) && is_edge(j, p)) {
               if (found == true) {
+                //cout << i << j << p << endl;
+                //print_g6();
                 return true;
               } else {
+                //cout << i << j << p << endl;
                 found = true;
               }
             }
           }
         }
       }
+      return false;
+
     default:
-      cerr << "has_cycle does not support n = " << n << endl;
+      cerr << "has_cycle does not support c = " << c << endl;
   }
   return false;
 }
@@ -174,44 +181,11 @@ bool g::has_cycle(int c) {
 bool g::has_ind_set(int k) {
   int i1, i2, i3, i4, i5, i6;
   switch (k) {
-        /*case 4:
-         for (i1 = 0; i1 < v; i1++) {
-          for (i2 = i1+1; i2 < v; i2++) {
-           if (am[i1][i2] == 0) {
-            for (i3 = i2+1; i3 < v; i3++) {
-             if (am[i1][i3] == 0 && am[i2][i3] == 0){
-              for (i4 = i3+1; i4 < v; i4++) {
-               if (am[i1][i4] == 0 && am[i2][i4] == 0 && am[i3][i4] == 0)
-                return 1;
-               }
-              }
-             }
-            }
-           }
-          }
-         return 0;
+        case 4:
+         cerr << "REALLY?\n";
 
         case 5:
-         for (i1 = 0; i1 < v; i1++) {
-          for (i2 = i1+1; i2 < v; i2++) {
-           if (am[i1][i2] == 0) {
-            for (i3 = i2+1; i3 < v; i3++) {
-             if (am[i1][i3] == 0 && am[i2][i3] == 0){
-              for (i4 = i3+1; i4 < v; i4++) {
-               if (am[i1][i4] == 0 && am[i2][i4] == 0 && am[i3][i4] == 0) {
-                for (i5 = i4+1; i5 < v; i5++) {
-                 if (am[i1][i5] == 0 && am[i2][i5] == 0 && am[i3][i5] == 0 &&
-                     am[i4][i5] == 0)
-                  return 1;
-                }
-               }
-              }
-             }
-            }
-           }
-          }
-         }
-         return 0;*/
+         cerr << "REALLY?\n";
 
         case 6:
          for (i1 = 0; i1 < n; i1++) {
@@ -229,7 +203,7 @@ bool g::has_ind_set(int k) {
                    if (!is_edge(i1, i6) && !is_edge(i2, i6) &&
                        !is_edge(i3, i6) && !is_edge(i4, i6) &&
                        !is_edge(i5, i6))
-                    return 1;
+                    return true;
                   }
                  }
                 }
@@ -240,9 +214,24 @@ bool g::has_ind_set(int k) {
            }
           }
          }
+         return false;
 
         default:
             cerr << "has_ind_set does not support k = " << k << endl;
   }
-  return 0;
+  return false;
 }
+
+void g::add_vertex() {
+  n += 1;
+  arraySize = n / intSize;
+  if ((n % intSize) != 0)
+    arraySize++;
+  gA.resize(n);
+
+  for (int i = 0; i < n; i++) {
+    gA[i].resize(arraySize, 0);
+  }
+}
+
+
