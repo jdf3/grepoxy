@@ -7,13 +7,15 @@
 
 #define DEBUG 0
 
-unsigned int num_bytes = 128;
-unsigned int sz;
+int num_bytes = 128;
+int sz;
+int v;
+int **am;
 
 int hasp3(int v, int *startp3);
 int hasindset(int sz, int *startkk);
 int hasc4();
 int hasindsetnoptr(int sz);
 void add_vertex();
-int makesp3(unsigned int *e, unsigned int s);
-int makes_ind_set(unsigned int *ne, unsigned int s);
+int makesp3(int *e, int s);
+int makes_ind_set(int *ne, int s);
