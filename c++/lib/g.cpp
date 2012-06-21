@@ -1,5 +1,7 @@
+#include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <list>
 
 #include "g.h"
 #include "set_operations.h"
@@ -42,16 +44,7 @@ g::g(string g6){
     edgestr = g6.substr(1);
   }
 
-  arraySize = n / intSize;
-  if ((n % intSize) != 0)
-    arraySize++;
   gA.resize(n);
-  /*degrees.resize(n);*/
-
-  for (int i = 0; i < n; i++) {
-    /*degrees[i] = 0;*/
-    gA[i].resize(arraySize, 0);
-  }
 
   sixbit = ((int) edgestr.at(0)) - 63;
   d = 6;
@@ -79,7 +72,7 @@ void g::print_g6(ostream *o) {
   else if (63 <= n && n <= 258047)
     *o << (char) 126 << ::itosbbe(n, 12)
        << ::itosbbe(n, 6) << ::itosbbe(n, 0);
-  else if (258048 <= n && n <= 68719476735)
+  else if (258048 <= n) /* && n <= 68719476735) */
     *o << (char) 126 << (char) 126 << ::itosbbe(n, 30)
        << ::itosbbe(n, 24) << ::itosbbe(n, 18) << ::itosbbe(n, 12)
        << ::itosbbe(n, 6) << ::itosbbe(n, 0);
@@ -104,23 +97,14 @@ void g::print_g6(ostream *o) {
   *o << endl;
 }
 
-void g::add_edge(int u, int v){
-  if (u < n && u >= 0 && v < n && v >= 0){
-    set_insert(u, gA[v]);
-    set_insert(v, gA[u]);
-  }
-  else{
-    cerr << "Error: Invalid vertices " << u << " and " << v << endl;
-    cerr << "Size of graph = " << n << endl;
-  }
+void g::add_edge(int u, int v) {
+  set_insert(u, gA[v]);
+  set_insert(v, gA[u]);
 }
 
 void g::remove_edge(int u, int v) {
-  if (u < n && u >= 0 && v < n && v >= 0
-      && in_set(u, gA[v]) && in_set(v, gA[u])) {
-    set_delete(u, gA[v]);
-    set_delete(v, gA[v]);
-  }
+  set_delete(u, gA[v]);
+  set_delete(v, gA[v]);
 }
 
 bool g::is_edge(int u, int v){
@@ -132,21 +116,15 @@ int g::order() {
 }
 
 int g::num_edges() {
-  recalc_edges();
-  return numEdges;
-}
-
-void g::recalc_edges() {
-  numEdges = 0;
+  int numEdges = 0;
   for (int i = 0; i < n - 1; i++) {
     for (int j = i; j < n; j++) {
       if (is_edge(i, j)) {
 	      numEdges++;
-	      degrees[i]++;
-	      degrees[j]++;
       }
     }
   }
+  return numEdges;
 }
 
 bool g::has_cycle(int c) {
@@ -178,7 +156,61 @@ bool g::has_cycle(int c) {
   return false;
 }
 
-bool g::has_ind_set(int k) {
+bool g::set_has_ind_set(int size_left, list<int> vertices) {
+  vector<int> indset;
+  list<int> copy (vertices.begin(), vertices.end());
+  return _set_has_ind_set_aux(size_left, indset, copy);
+}
+
+bool g::_set_has_ind_set_aux(int size_left, vector<int> indset, list<int> vertices) {
+  int nv;
+
+  if (size_left == 0) return true;
+  if ((int) vertices.size() < size_left) return false;
+
+  for (vector<int>::iterator it = indset.begin();
+       it != indset.end(); it++) {
+    if (is_edge(*it, vertices.front())) {
+      vertices.pop_front();
+      return _set_has_ind_set_aux(size_left, indset, vertices);
+    }
+  }
+
+  nv = vertices.front();
+  vertices.pop_front();
+  if (_set_has_ind_set_aux(size_left, indset, vertices)) return true;
+
+  indset.push_back(nv);
+  return _set_has_ind_set_aux(size_left-1, indset, vertices);
+}
+
+bool g::has_ind_set(int size_left, vector<int> indset, int pos) {
+  if (size_left == 0) return true;
+  if ((n - 1) - pos > size_left) return false;
+
+  for (vector<int>::iterator it = indset.begin();
+       it != indset.end(); it++) {
+    if (is_edge(*it, pos)) {
+      return has_ind_set(size_left, indset, pos+1);
+    }
+  }
+
+  if (has_ind_set(size_left, indset, pos+1)) return true;
+  indset.push_back(pos);
+  return (has_ind_set(size_left-1, indset, pos+1));
+}
+
+bool g::makes_p3(list<int> edges, int next) {
+  for (list<int>::iterator it = edges.begin();
+       it != edges.end(); it++) {
+    for (int i = 0; i < n-1; i++) {
+      if (is_edge(*it, i) && is_edge(next, i)) return true;
+    }
+  }
+  return false;
+}
+
+/*bool g::has_ind_set(int k) {
   int i1, i2, i3, i4, i5, i6;
   switch (k) {
         case 4:
@@ -220,18 +252,50 @@ bool g::has_ind_set(int k) {
             cerr << "has_ind_set does not support k = " << k << endl;
   }
   return false;
-}
+}*/
 
 void g::add_vertex() {
   n += 1;
-  arraySize = n / intSize;
-  if ((n % intSize) != 0)
-    arraySize++;
   gA.resize(n);
-
-  for (int i = 0; i < n; i++) {
-    gA[i].resize(arraySize, 0);
-  }
 }
 
+void g::addedges(int s) {
+  size = s;
+  list<int> no_edges;
+  list<int> edges;
 
+  _addedges(0, edges, no_edges);
+}
+
+void g::_addedges(int next, list<int> edges,
+               list<int> no_edges) {
+  if (next == n-1) {
+    print_g6();
+    print_am();
+    return;
+  }
+
+  remove_edge(next, n-1);
+  no_edges.push_back(next);
+  if (!(set_has_ind_set(size-1, no_edges))) {
+    _addedges(next+1, edges, no_edges);
+  }
+
+  add_edge(next, n-1);
+
+  if (!(makes_p3(edges, next))) {
+    no_edges.pop_back();
+    edges.push_back(next);
+    _addedges(next+1, edges, no_edges);
+  }
+  return;
+}
+
+void g::print_am() {
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      cout << is_edge(i, j) << " ";
+    }
+    cout << endl;
+  }
+}

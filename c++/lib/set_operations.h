@@ -6,17 +6,16 @@
 
 using namespace std;
 
-typedef vector<uint64_t> vset;
 const int intSize = sizeof(uint64_t) * 8;
 const uint64_t shifter = 1;
 const uint64_t empty = 0;
 
-void set_insert(int u, vset &S);
-void set_delete(int u, vset &S);
-bool in_set(int u, vset S);
-void set_cut(int u, vset &S, int arraySize);
-vset set_union(vset S, vset R, int arraySize);
-vset set_intersection(vset S, vset R, int arraySize);
-bool not_empty(vset S);
+void set_insert(int u, uint64_t S);
+void set_delete(int u, uint64_t S);
+bool in_set(int u, uint64_t S);
+void set_cut(int u, uint64_t S, int arraySize);
+uint64_t set_union(uint64_t S, uint64_t R);
+uint64_t set_intersection(uint64_t S, uint64_t R);
+bool not_empty(uint64_t S);
 
 #endif
