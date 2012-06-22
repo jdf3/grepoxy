@@ -10,35 +10,25 @@
 */
 
 // insert bit into set
-// algorithm 1.3
-void set_insert(int u, vector<bool> V){
-  int j = intSize - 1 - (u % intSize);
-  V = V | (shifter << j);
+void set_insert(int u, vset &V){
+  V[u] = 1;
 }
 
 // delete bit from set
-// Algorithm 1.4
-void set_delete(int u, uint64_t V) {
-  int j = intSize - 1 - (u % intSize);
-  V = V & ~(shifter << j);
+void set_delete(int u, vset &V) {
+  V[u] = 0;
 }
 
-// determine if a bit is in S
-// Algorithm 1.5
-bool in_set(int u, uint64_t V) {
-  int j = intSize - 1 - (u % intSize);
-  if (V & (shifter << j)) {
-    return true;
-  } else {
-    return false;
-  }
+// determine if a bit is in V
+bool in_set(int u, vset &V) {
+  return (V[u] == 0) ? false : true;
 }
 
 // I WAS RIGHT HERE
 
 // removes bit from set
 /*
-void set_cut(int u, uint64_t V, int arraySize) {
+void set_cut(int u, vset V, int arraySize) {
   int j = u % intSize;
   uint64_t x = (V & ((~empty) >> (j+1))) << 1;
   if (j == 0) {
@@ -58,11 +48,10 @@ void set_cut(int u, uint64_t V, int arraySize) {
     }
     S[i+1] = S[i+1] << 1;
   }
-}*/
+}
 
 // determine union of two sets
-// Algorithm 1.6
-uint64_t set_union(uint64_t S, uint64_t R) {
+vset set_union(vset S, vset R) {
   return S | R;
 }
 
@@ -71,8 +60,12 @@ uint64_t set_union(uint64_t S, uint64_t R) {
 uint64_t set_intersection(uint64_t S, uint64_t R, int arraySize) {
   return S & R;
 }
+*/
 
 // determine if a set is empty
-bool not_empty(uint64_t S) {
-  return ((S > 0) ? true : false);
+bool not_empty(vset &V) {
+  for (vset::iterator it = V.begin(); it != V.end(); it++) {
+    if (*it != 0) return true;
+  }
+  return false;
 }

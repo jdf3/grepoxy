@@ -22,16 +22,17 @@ int main(int argc, char *argv[])
   am_sz = 0;
 
   sz = atoi(argv[1]);
+
   if (sz == 1) {
     fprintf(stderr,
-            "Illegal value for size of forbidden independent set: %d", sz);
+            "Illegal value for size of forbidden independent set: %d\n", sz);
   }
 
   while (getline(&g6, &num_bytes, stdin) != EOF) {
-    printf("GOT: "); printf(g6);
+    // printf("GOT: "); printf(g6);
     g6_to_am(g6);
     // printf("ORDER: %d\n", v);
-    //printf("TRANSLATED: "); print_g6();
+    // printf("TRANSLATED: "); print_g6();
     add_vertex();
   }
   free(g6);
@@ -57,33 +58,24 @@ void add_vertex() {
 
 void _add_vertex_aux(int s, int *e, int i,
                      int *ne, int j) {
-  printf("1\n");
-  if (s == (v-1)) print_g6();
+  if (s == (v-1)) {
+    print_g6();
+    return;
+  }
   if (!makesp3(e, s)) {
-    am[s][v] = (int) 0;
-      printf("2\n");
-    am[v][s] = (int) 0;
-      printf("3\n");
+    am[s][v] = 0;
+    am[v][s] = 0;
     e[i] = s;
-      printf("4\n");
     e[i+1] = v;
-      printf("5\n");
     ne[j] = v;
-      printf("6\n");
     _add_vertex_aux(s+1, e, i+1, ne, j);
   }
-  if (!makes_ind_set(ne, s)) {
+  if (!has_ind_set(ne, s)) {
     am[s][v] = 1;
-      printf("b\n");
-
     am[v][s] = 1;
-      printf("c\n");
     ne[j] = s;
-      printf("d\n");
     ne[j+1] = v;
-      printf("e\n");
     e[i] = v;
-      printf("f\n");
     _add_vertex_aux(s+1, e, i, ne, j+1);
   }
 }
@@ -164,7 +156,7 @@ int hasp3(int v, int *startp3) {
 
 /* Determine if the vertices given by startkk contain an independent
  * set of size sz in am. */
-int hasindset(int sz, int *startkk)
+int has_ind_set(int sz, int *startkk)
 {
   int i1, i2, i3, i4, i5, i6, k;
   int *p1, *p2, *p3, *p4, *p5, *p6, *d;

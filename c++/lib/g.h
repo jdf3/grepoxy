@@ -34,7 +34,7 @@ class g {
 
   private:
     int n;
-    vector<uint64_t> gA;
+    vector<vset> gA;
     int size;
 
   private:

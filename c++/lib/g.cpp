@@ -104,7 +104,7 @@ void g::add_edge(int u, int v) {
 
 void g::remove_edge(int u, int v) {
   set_delete(u, gA[v]);
-  set_delete(v, gA[v]);
+  set_delete(v, gA[u]);
 }
 
 bool g::is_edge(int u, int v){
@@ -254,9 +254,26 @@ bool g::makes_p3(list<int> edges, int next) {
   return false;
 }*/
 
+/* inefficient, but i can't do it another way... */
 void g::add_vertex() {
+  // There's a memory leak here, obviously, but I want to rewrite it anyways.
   n += 1;
-  gA.resize(n);
+  vector<vset> gAnew (n);
+  for (int i = 0; i < n; i++) {
+    gAnew[i].resize(n);
+  }
+  for (int i = 0; i < n-1; i++) {
+    for (int j = 0; j < n-1; j++) {
+      gAnew[i][j] = gA[i][j];
+    }
+  }
+  gA = gAnew;
+  // I'd like to be able to do this:
+  /*gA.resize(n);
+  for (int i = 0; i < n; i++) {
+    gA[i].resize(n);
+  }*/
+  // ...but it doesn't work.
 }
 
 void g::addedges(int s) {
@@ -271,7 +288,7 @@ void g::_addedges(int next, list<int> edges,
                list<int> no_edges) {
   if (next == n-1) {
     print_g6();
-    print_am();
+    // print_am();
     return;
   }
 
@@ -294,7 +311,7 @@ void g::_addedges(int next, list<int> edges,
 void g::print_am() {
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
-      cout << is_edge(i, j) << " ";
+      cout << is_edge(i, j) <<  " ";
     }
     cout << endl;
   }

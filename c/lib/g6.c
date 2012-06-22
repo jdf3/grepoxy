@@ -6,12 +6,11 @@
 void _alloc_am();
 void _realloc_am();
 
-int _g6_order(int s, int len, char *g6) {
+int _g6_order(int s, int e, char *g6) {
   int vert = 0;
-  int i = 0;
-  while (i < len) {
-    vert += ((((int) g6[s]) - 63) << (6 * (len - 1 - i)));
-    i++;
+  while (s < e) {
+    vert += ((((int) g6[s]) - 63) << (6 * (e - 1 - s)));
+    s++;
   }
   return vert;
 }
@@ -24,10 +23,10 @@ void g6_to_am(char *g6) {
     v = _g6_order(0, 1, g6);
     g6++;
   } else if ((int) g6[1] != 126) {
-    v = _g6_order(1, 3, g6);
+    v = _g6_order(1, 4, g6);
     g6 += 4;
   } else {
-    v = _g6_order(2, 6, g6);
+    v = _g6_order(2, 8, g6);
     g6 += 8;
   }
 
@@ -134,7 +133,6 @@ void print_g6()
   if (i != 0) {
     sixbit = sixbit << (6 - i);
     printf("%c", (63 + sixbit));
-    printf("\n4\n");
   }
   printf("\n");
 }
