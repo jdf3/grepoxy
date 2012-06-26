@@ -8,7 +8,6 @@
 
 #define DEBUG 0
 
-extern int num_bytes;
 extern int am[MV][MV];
 extern int v;
 extern int oldv;

@@ -4,18 +4,19 @@
 #include "addv.h"
 int v = 0;
 int am[][MV];
-int num_bytes = (MV-1)*MV/12 + 1;
 int oldv;
 
 void print_g6();
 void g6_to_am(char*);
 void print_am();
+int hasp3(int*);
+int hasindset(int, int*);
 
 int main(int argc, char *argv[])
 {
-    char *g6 = (char *) malloc(num_bytes + 1);
+    size_t num_bytes = 0;
+    char *g6 = NULL;
     int i, j, max, b, sz, ct, oldv;
-    char d;
     int *startp3, *startkk, *p, *k;
 
     ct = 0;
@@ -23,17 +24,18 @@ int main(int argc, char *argv[])
     startkk = malloc(MV*sizeof(int));
     if (argc != 2) {
         fprintf(stderr, USAGE);
+        return 1;
     }
 
     sz = atoi(argv[1]);
 
-    while (getline(&g6, &num_bytes, stdin) != EOF) {
+    while (getline(&g6, &num_bytes, stdin) != -1) {
         g6_to_am(g6);
         oldv = v;
         ++v;
         max = 2 << v;
-        // Add a vertex and all possible edges and print the g6
-        // representation if the graph is a (C4, Kk)-graph.
+        /* Add a vertex and all possible edges and print the g6
+         * representation if the graph is a (C4, Kk)-graph. */
         for (i = 0; i < max; i++) {
             p = startp3;
             k = startkk;
@@ -71,19 +73,19 @@ int main(int argc, char *argv[])
     free(startp3);
     free(startkk);
     free(g6);
+    return 0;
 }
 
 /* Determine if the vertices given by startp3 make a P3 in am. */
 int hasp3(int *startp3)
 {
-    int i, j, k, ct;
+    int i, j, k;
     int *p, *r;
 
     p = startp3;
     if (DEBUG) fprintf(stderr, "\n");
 
     for (i = *p; i < v; i = *(++p)) {
-        ct = 0;
         r = p+1;
         for (j = *r; j < v; j = *(++r)) {
             for (k = 0; k < v-1; k++) {
@@ -95,9 +97,7 @@ int hasp3(int *startp3)
             }
             if (DEBUG) fprintf(stderr, "(%d, %d) do not form a P3\n", i, j);
         }
-        //free(r);
     }
-    //free(p);
     return 0;
 }
 
@@ -105,23 +105,9 @@ int hasp3(int *startp3)
  * set of size sz in am. */
 int hasindset(int sz, int *startkk)
 {
-    int i1, i2, i3, i4, i5, i6, k;
-    int *p1, *p2, *p3, *p4, *p5, *p6, *d;
+    int i1, i2, i3, i4, i5, i6;
+    int *p1, *p2, *p3, *p4, *p5, *p6;
 
-    /*p1 = malloc(sizeof(startkk));
-    p2 = malloc(sizeof(startkk));
-    p3 = malloc(sizeof(startkk));
-    p4 = malloc(sizeof(startkk));
-    p5 = malloc(sizeof(startkk));
-    p6 = malloc(sizeof(startkk));*/
-    if (DEBUG) {
-        d = startkk;
-        k = *d;
-        while (k < v) {
-            fprintf(stderr, "%d ", k = *(d++));
-        }
-        fprintf(stderr, "\n");
-    }
     p1 = startkk;
     switch (sz) {
         case 4:
@@ -215,6 +201,7 @@ int hasindset(int sz, int *startkk)
          }
          return 0;
     }
+    return 0;
 }
 /* Print a g6 representation of the graph given by am. */
 void print_g6()
@@ -225,7 +212,7 @@ void print_g6()
         printf("%c", v + 63);
     else if (63 <= v && v <= 258047)
         printf("%c%c%c%c", 126, v >> 12, v >> 6, v);
-    else if (258048 <= v && v <= 68719476735)
+    else if (258048 <= v) /* && v <= 68719476735) */
         printf("%c%c%c%c%c%c%c%c", 126, 126, v >> 30, v >> 24,
                v >> 18, v >> 12, v >> 6, v);
     else {
@@ -276,7 +263,6 @@ int hasindsetnoptr(int sz)
 {
     int i1, i2, i3, i4, i5, i6;
 
-    //printf("%d", sz);
     switch (sz) {
         case 4:
          for (i1 = 0; i1 < v; i1++) {
@@ -350,6 +336,7 @@ int hasindsetnoptr(int sz)
             fprintf(stderr, "Currently, this program only detects cliques of size between %d and %d, inclusive.\n", \
                     MINCLIQUE, MAXCLIQUE);
     }
+    return 0;
 }
 
 int _g6_order(int s, int e, char *g6) {
